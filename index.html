@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> <!-- Отключаем масштабирование -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Счётчик напитков</title>
     <style>
         body {
@@ -17,7 +17,7 @@
             padding: 20px;
         }
         h1 {
-            font-size: 15vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
+            font-size: 30vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
             margin-bottom: 20px;
             margin: 0;
             width: 100%;
@@ -40,22 +40,21 @@
             font-size: 2rem;
             margin-top: 20px;
         }
-        /* Кнопка для редактирования */
+        /* Маленькая кнопка для корректировки */
         #editButton {
-            position: fixed; /* фиксируем её на экране */
-            top: 20px; /* немного отступим сверху */
-            left: 20px; /* сдвигаем влево для удобства */
-            font-size: 1.5rem; /* увеличиваем размер кнопки */
-            padding: 15px 30px; /* увеличиваем размер кнопки */
-            background-color: #4CAF50; /* зелёный цвет */
-            color: white; /* белый текст */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1rem;
+            padding: 10px;
+            background-color: transparent;
+            color: black;
             border: none;
             cursor: pointer;
-            border-radius: 10px; /* скругляем углы */
-            opacity: 0.9; /* немного прозрачности для современного вида */
+            opacity: 0.5; /* Сделаем кнопку полупрозрачной */
         }
         #editButton:hover {
-            opacity: 1; /* при наведении кнопка будет полностью видимой */
+            opacity: 1; /* Сделаем кнопку более заметной при наведении */
         }
     </style>
 </head>
@@ -65,4 +64,39 @@
     <p id="message"></p>
 
     <!-- Кнопка для редактирования -->
-  
+    <button id="editButton" onclick="editCounter()">Изменить</button>
+
+    <script>
+        // Считываем сохранённое значение из LocalStorage
+        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 500;
+
+        // Обновляем счётчик на странице
+        document.getElementById('counter').textContent = count;
+
+        function decreaseCounter() {
+            if (count > 0) {
+                count--;
+                // Сохраняем новое значение в LocalStorage
+                localStorage.setItem('counter', count);
+                document.getElementById('counter').textContent = count;
+                if (count === 0) {
+                    document.getElementById('message').textContent = "Все напитки, к сожалению, уже раздали.";
+                    document.getElementById('clickButton').disabled = true;
+                }
+            }
+        }
+
+        // Функция для редактирования счётчика
+        function editCounter() {
+            const newCount = prompt("Введите новое количество напитков:", count);
+            if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
+                count = parseInt(newCount);
+                localStorage.setItem('counter', count);
+                document.getElementById('counter').textContent = count;
+                document.getElementById('message').textContent = ""; // Очищаем сообщение
+                document.getElementById('clickButton').disabled = false; // Включаем кнопку, если счётчик больше 0
+            }
+        }
+    </script>
+</body>
+</html>
