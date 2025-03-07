@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> <!-- Отключаем масштабирование -->
     <title>Счётчик напитков</title>
     <style>
         body {
@@ -17,7 +17,7 @@
             padding: 20px;
         }
         h1 {
-            font-size: 30vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
+            font-size: 15vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
             margin-bottom: 20px;
             margin: 0;
             width: 100%;
@@ -40,22 +40,22 @@
             font-size: 2rem;
             margin-top: 20px;
         }
-        /* Стили для маленькой кнопки */
+        /* Кнопка для редактирования */
         #editButton {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1rem;
-            padding: 5px 10px;
-            background-color: rgba(0, 0, 0, 0.1);
-            color: black;
-            border-radius: 5px;
+            position: fixed; /* фиксируем её на экране */
+            top: 20px; /* немного отступим сверху */
+            left: 20px; /* сдвигаем влево для удобства */
+            font-size: 1.5rem; /* увеличиваем размер кнопки */
+            padding: 15px 30px; /* увеличиваем размер кнопки */
+            background-color: #4CAF50; /* зелёный цвет */
+            color: white; /* белый текст */
+            border: none;
             cursor: pointer;
-            display: none;
+            border-radius: 10px; /* скругляем углы */
+            opacity: 0.9; /* немного прозрачности для современного вида */
         }
-        /* Показ кнопки при наведении */
-        body:hover #editButton {
-            display: inline-block;
+        #editButton:hover {
+            opacity: 1; /* при наведении кнопка будет полностью видимой */
         }
     </style>
 </head>
@@ -63,40 +63,6 @@
     <h1 id="counter">500</h1>
     <button id="clickButton" onclick="decreaseCounter()">Забрать напиток</button>
     <p id="message"></p>
-    
-    <!-- Скрытая кнопка для редактирования счётчика -->
-    <button id="editButton" onclick="editCounter()">Изменить</button>
 
-    <script>
-        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 500;
-
-        document.getElementById('counter').textContent = count;
-
-        function decreaseCounter() {
-            if (count > 0) {
-                count--;
-                localStorage.setItem('counter', count);
-                document.getElementById('counter').textContent = count;
-                if (count === 0) {
-                    document.getElementById('message').textContent = "Все напитки, к сожалению, уже раздали.";
-                    document.getElementById('clickButton').disabled = true;
-                }
-            }
-        }
-
-        // Функция для редактирования счётчика
-        function editCounter() {
-            const newCount = prompt("Введите новое количество напитков:", count);
-            if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
-                count = parseInt(newCount);
-                localStorage.setItem('counter', count);
-                document.getElementById('counter').textContent = count;
-                document.getElementById('message').textContent = "";
-                document.getElementById('clickButton').disabled = false;
-            } else {
-                alert("Введите корректное число.");
-            }
-        }
-    </script>
-</body>
-</html>
+    <!-- Кнопка для редактирования -->
+  
