@@ -17,7 +17,7 @@
             padding: 20px;
         }
         h1 {
-            font-size: 30vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
+            font-size: 15vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
             margin-bottom: 20px;
             margin: 0;
             width: 100%;
@@ -48,11 +48,17 @@
     <p id="message"></p>
 
     <script>
-        let count = 500;
+        // Считываем сохранённое значение из LocalStorage
+        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 500;
+
+        // Обновляем счётчик на странице
+        document.getElementById('counter').textContent = count;
 
         function decreaseCounter() {
             if (count > 0) {
                 count--;
+                // Сохраняем новое значение в LocalStorage
+                localStorage.setItem('counter', count);
                 document.getElementById('counter').textContent = count;
                 if (count === 0) {
                     document.getElementById('message').textContent = "Все напитки, к сожалению, уже раздали.";
