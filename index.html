@@ -2,32 +2,33 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Контролируем масштабирование -->
+    <!-- Отключаем масштабирование при двойном тапе или жестах -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Счётчик напитков</title>
     <style>
-        /* Отключаем прокрутку и устанавливаем общее поведение */
+        /* Общие стили для всего документа */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh; /* Используем всю высоту экрана */
-            width: 100vw; /* Используем всю ширину экрана */
+            height: 100vh;
+            width: 100vw;
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f8f8f8;
-            overflow: hidden; /* Отключаем прокрутку */
+            overflow: hidden;
+            touch-action: manipulation; 
         }
 
         h1 {
-            font-size: 15vw; /* Размер шрифта зависит от ширины экрана */
+            font-size: 30vw;
             margin-bottom: 20px;
             margin: 0;
             width: 100%;
@@ -42,7 +43,7 @@
             background-color: #ff5722;
             color: white;
             border-radius: 15px;
-            max-width: 90%; /* Ограничиваем максимальную ширину кнопки */
+            max-width: 90%;
         }
 
         button:disabled {
@@ -56,7 +57,6 @@
             width: 100%;
         }
 
-        /* Маленькая кнопка для редактирования */
         #editButton {
             position: absolute;
             top: 10px;
