@@ -81,7 +81,7 @@
     <p id="message"></p>
 
     <!-- Кнопка для редактирования -->
-    <button id="editButton" onclick="editCounter()">Изменить</button>
+    <button id="editButton" onclick="editCounter()">ED</button>
 
     <script>
         // Считываем сохранённое значение из LocalStorage
@@ -105,7 +105,7 @@
 
         // Функция для редактирования счётчика
         function editCounter() {
-            const newCount = prompt("Введите новое количество напитков:", count);
+            const newCount = prompt("Отредактировать количество напитков:", count);
             if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
                 count = parseInt(newCount);
                 localStorage.setItem('counter', count);
