@@ -2,28 +2,38 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Мета-тег для отключения масштабирования -->
+    <!-- Контролируем масштабирование -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Счётчик напитков</title>
     <style>
+        /* Отключаем прокрутку и устанавливаем общее поведение */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100vh; /* Используем всю высоту экрана */
+            width: 100vw; /* Используем всю ширину экрана */
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f8f8f8;
-            padding: 20px;
+            overflow: hidden; /* Отключаем прокрутку */
         }
+
         h1 {
-            font-size: 15vw; /* Используем vw, чтобы размер шрифта зависел от ширины экрана */
+            font-size: 15vw; /* Размер шрифта зависит от ширины экрана */
             margin-bottom: 20px;
             margin: 0;
             width: 100%;
             text-align: center;
         }
+
         button {
             font-size: 3rem;
             padding: 20px 40px;
@@ -32,16 +42,21 @@
             background-color: #ff5722;
             color: white;
             border-radius: 15px;
+            max-width: 90%; /* Ограничиваем максимальную ширину кнопки */
         }
+
         button:disabled {
             background-color: gray;
             cursor: not-allowed;
         }
+
         p {
             font-size: 2rem;
             margin-top: 20px;
+            width: 100%;
         }
-        /* Маленькая кнопка для корректировки */
+
+        /* Маленькая кнопка для редактирования */
         #editButton {
             position: absolute;
             top: 10px;
@@ -52,10 +67,11 @@
             color: black;
             border: none;
             cursor: pointer;
-            opacity: 0.5; /* Сделаем кнопку полупрозрачной */
+            opacity: 0.5;
         }
+
         #editButton:hover {
-            opacity: 1; /* Сделаем кнопку более заметной при наведении */
+            opacity: 1;
         }
     </style>
 </head>
