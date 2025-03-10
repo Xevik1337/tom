@@ -6,8 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Счётчик напитков</title>
     <style>
-        /* Импортируем шрифт Poppins с Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+        /* Подключаем шрифт Junegull */
+        @font-face {
+            font-family: 'Junegull';
+            src: url('Junegull.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
 
         /* Общие стили для всего документа */
         * {
@@ -23,7 +28,7 @@
             justify-content: center;
             height: 100vh;
             width: 100vw;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Junegull', sans-serif;
             text-align: center;
             background-color: #F4A6D7; /* Светло-розовый фон */
             overflow: hidden;
@@ -39,7 +44,7 @@
             color: #0047BB; /* Тёмно-синий цвет текста */
             -webkit-text-stroke: 4px white; /* Белая обводка текста */
             text-stroke: 4px white;
-            font-weight: 700; /* Жирный шрифт */
+            font-weight: normal; /* Junegull не имеет вариаций веса */
         }
 
         button#clickButton {
@@ -51,8 +56,8 @@
             color: white; /* Белый текст */
             border-radius: 30px; /* Скруглённые углы */
             max-width: 90%;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
+            font-family: 'Junegull', sans-serif;
+            font-weight: normal;
         }
 
         button#clickButton:disabled {
@@ -65,8 +70,8 @@
             margin-top: 20px;
             width: 100%;
             color: #0047BB; /* Тёмно-синий цвет текста */
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
+            font-family: 'Junegull', sans-serif;
+            font-weight: normal;
         }
 
         #editButton {
@@ -76,12 +81,12 @@
             font-size: 1rem;
             padding: 10px;
             background-color: transparent;
-            color: #003087; /* Синий цвет */
+            color: #0047BB; /* Синий цвет */
             border: none;
             cursor: pointer;
             opacity: 0.5;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
+            font-family: 'Junegull', sans-serif;
+            font-weight: normal;
         }
 
         #editButton:hover {
