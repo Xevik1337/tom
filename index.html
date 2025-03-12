@@ -51,6 +51,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            position: relative; /* Для позиционирования счётчика в кнопке */
         }
         .full-button {
             width: 70vw;
@@ -147,11 +148,21 @@
             font-size: min(5vw, 2rem); /* Уменьшаем кнопку */
             padding: min(4vw, 15px) min(8vw, 30px);
         }
+        .button-counter {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: min(2vw, 1rem); /* Маленький размер счётчика */
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <h1 id="counter">500</h1>
-    <button id="clickButton">Забрать напиток</button>
+    <button id="clickButton">Забрать напиток<span id="buttonCounter" class="button-counter"></span></button>
     <p id="message"></p>
     <details id="editButton">
         <summary>ED</summary>
@@ -195,6 +206,7 @@
         let isEditMode = false;
         const counterEl = document.getElementById('counter');
         const buttonEl = document.getElementById('clickButton');
+        const buttonCounterEl = document.getElementById('buttonCounter');
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
         const editValueButton = document.getElementById('editValue');
@@ -202,6 +214,9 @@
         const buttonModeButton = document.getElementById('buttonMode');
         const resetModeButton = document.getElementById('resetMode');
         const bodyEl = document.body;
+
+        // Установите свой PIN-код здесь
+        const correctPin = "1234"; // Замените на нужный четырёхзначный код
 
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
@@ -212,6 +227,7 @@
                 } else {
                     count = snapshot.val();
                     counterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
                     updateUI();
                     console.log("Счётчик загружен из Firebase:", count);
                 }
@@ -220,6 +236,7 @@
             onValue(counterRef, (snapshot) => {
                 count = snapshot.val() !== null ? snapshot.val() : 500;
                 counterEl.textContent = count;
+                buttonCounterEl.textContent = count; // Обновляем маленький счётчик
                 updateUI();
                 console.log("Счётчик обновлён из Firebase:", count);
             }, (error) => {
@@ -227,6 +244,7 @@
             });
         } else {
             counterEl.textContent = count;
+            buttonCounterEl.textContent = count; // Обновляем маленький счётчик
             updateUI();
             console.warn("Firebase не работает, используем локальный режим");
         }
@@ -241,6 +259,7 @@
                         .catch((error) => console.error("Ошибка записи в Firebase:", error));
                 } else {
                     counterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
                     updateUI();
                     console.log("Локально уменьшен до:", count);
                 }
@@ -269,6 +288,7 @@
                         .catch((error) => console.error("Ошибка записи в Firebase:", error));
                 } else {
                     counterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
                     updateUI();
                     console.log("Локально отредактирован до:", count);
                 }
@@ -310,6 +330,17 @@
             console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
+
+        // Запрос PIN-кода при клике на ED
+        editButtonEl.querySelector('summary').addEventListener('click', function(event) {
+            if (!editButtonEl.hasAttribute('open')) { // Проверяем, закрыто ли меню
+                const pin = prompt("Введите четырёхзначный PIN-код:");
+                if (pin === null || pin.length !== 4 || pin !== correctPin) {
+                    alert("Неверный PIN-код!");
+                    event.preventDefault(); // Предотвращаем открытие меню
+                }
+            }
+        });
 
         // Закрытие меню при клике вне его
         document.addEventListener('click', function(event) {
