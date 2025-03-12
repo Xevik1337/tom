@@ -215,7 +215,7 @@
         const bodyEl = document.body;
 
         // Установите свой PIN-код здесь
-        const correctPin = "1732"; 
+        const correctPin = "8732"; // Замените на нужный четырёхзначный код
 
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
@@ -305,6 +305,7 @@
             mainCounterEl.classList.add('expanded');
             messageEl.classList.add('hidden');
             isEditMode = false;
+            localStorage.setItem('mode', 'counter'); // Сохраняем режим
             console.log("Переключено в режим счётчика");
             editButtonEl.removeAttribute('open');
         }
@@ -317,6 +318,7 @@
             buttonCounterEl.classList.remove('hidden'); // Показываем счётчик кнопки
             messageEl.classList.remove('hidden');
             isEditMode = true;
+            localStorage.setItem('mode', 'button'); // Сохраняем режим
             console.log("Переключено в режим кнопки");
             editButtonEl.removeAttribute('open');
         }
@@ -328,6 +330,7 @@
             buttonEl.classList.remove('hidden', 'full-button');
             messageEl.classList.remove('hidden');
             isEditMode = false;
+            localStorage.setItem('mode', 'combined'); // Сохраняем режим
             console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
@@ -350,14 +353,28 @@
             }
         });
 
+        // Восстановление сохранённого состояния
+        function restoreState() {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'counter') {
+                setCounterMode();
+            } else if (savedMode === 'button') {
+                setButtonMode();
+            } else if (savedMode === 'combined') {
+                resetToInitial();
+            } else {
+                resetToInitial(); // По умолчанию, если нет сохранённого состояния
+            }
+        }
+
         buttonEl.onclick = decreaseCounter;
         editValueButton.onclick = editCounter;
         counterModeButton.onclick = setCounterMode;
         buttonModeButton.onclick = setButtonMode;
         resetModeButton.onclick = resetToInitial;
 
-        // Инициализация: счётчик и кнопка вместе при загрузке
-        resetToInitial();
+        // Инициализация: восстановление сохранённого состояния
+        restoreState();
         updateUI();
     </script>
 </body>
