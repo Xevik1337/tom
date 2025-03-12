@@ -311,6 +311,13 @@
             editButtonEl.removeAttribute('open');
         }
 
+        // Закрытие меню при клике вне его
+        document.addEventListener('click', function(event) {
+            if (!editButtonEl.contains(event.target)) {
+                editButtonEl.removeAttribute('open');
+            }
+        });
+
         buttonEl.onclick = decreaseCounter;
         editValueButton.onclick = editCounter;
         counterModeButton.onclick = setCounterMode;
