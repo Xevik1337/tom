@@ -33,22 +33,29 @@
             font-weight: normal;
         }
         button#clickButton {
-            font-size: 2rem;
-            padding: 15px 30px;
+            font-size: 1.5rem; /* Уменьшен размер шрифта */
+            padding: 10px 20px; /* Уменьшены отступы */
             cursor: pointer;
             border: none;
             background-color: #0047BB;
             color: white;
-            border-radius: 30px;
-            max-width: 90%;
+            border-radius: 20px; /* Уменьшен радиус */
             font-family: 'Junegull', sans-serif;
             font-weight: normal;
+            position: relative; /* Центрирование */
+            margin-top: 20px; /* Отступ сверху для центрирования */
         }
         button#clickButton:disabled {
             background-color: #666;
             cursor: not-allowed;
         }
-        p { font-size: 1.5rem; color: #0047BB; font-family: 'Junegull', sans-serif; }
+        p { 
+            font-size: 1.5rem; 
+            color: #0047BB; 
+            font-family: 'Junegull', sans-serif; 
+            text-align: center; 
+            margin-top: 10px; 
+        }
         #editButton {
             position: absolute;
             top: 10px;
@@ -64,7 +71,13 @@
         #editButton:hover { opacity: 1; }
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .full-button { width: 80%; height: 60%; font-size: 4rem; }
+        .full-button { 
+            font-size: 2rem; /* Уменьшен размер кнопки в режиме кнопки */
+            padding: 15px 30px; 
+            width: auto; /* Убрана фиксированная ширина */
+            height: auto; /* Убрана фиксированная высота */
+            margin-top: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -102,7 +115,6 @@
         } catch (error) {
             console.error("Ошибка инициализации Firebase:", error);
             alert("Не удалось подключиться к Firebase. Кнопки будут работать локально.");
-            // Убираем return, продолжаем выполнение
         }
 
         let count = 500;
@@ -114,7 +126,6 @@
 
         // Инициализация Firebase и синхронизация
         if (firebaseInitialized) {
-            // Устанавливаем начальное значение, если его нет
             onValue(counterRef, (snapshot) => {
                 if (!snapshot.exists()) {
                     set(counterRef, 500)
@@ -128,7 +139,6 @@
                 }
             }, { onlyOnce: true });
 
-            // Синхронизация с Firebase
             onValue(counterRef, (snapshot) => {
                 count = snapshot.val() !== null ? snapshot.val() : 500;
                 counterEl.textContent = count;
@@ -138,7 +148,6 @@
                 console.error("Ошибка чтения из Firebase:", error);
             });
         } else {
-            // Локальная инициализация, если Firebase не работает
             counterEl.textContent = count;
             updateUI();
             console.warn("Firebase не работает, используем локальный режим");
@@ -176,10 +185,26 @@
         // Переключение режима и редактирование
         function editAndToggleMode() {
             console.log("Кнопка 'ED' нажата, текущий режим:", isEditMode);
+            const input = prompt("Введите:\n1 - режим счётчика\n2 - режим кнопки\nили число для редактирования счётчика:", "");
+            
+            if (input === null) return; // Ничего не делаем при "Отмена"
 
-            const newCount = prompt("Отредактировать количество напитков (оставьте пустым для переключения режима):", count);
-            if (newCount !== null && newCount !== "" && !isNaN(newCount) && newCount >= 0) {
-                count = parseInt(newCount);
+            if (input === "1") {
+                buttonEl.classList.add('hidden');
+                counterEl.classList.remove('hidden');
+                counterEl.classList.add('expanded');
+                messageEl.classList.add('hidden');
+                isEditMode = false;
+                console.log("Переключено в режим счётчика");
+            } else if (input === "2") {
+                counterEl.classList.remove('expanded');
+                counterEl.classList.add('hidden');
+                buttonEl.classList.remove('hidden');
+                buttonEl.classList.add('full-button');
+                isEditMode = true;
+                console.log("Переключено в режим кнопки");
+            } else if (!isNaN(input) && input !== "" && parseInt(input) >= 0) {
+                count = parseInt(input);
                 if (firebaseInitialized) {
                     set(counterRef, count)
                         .then(() => console.log("Счётчик отредактирован до:", count))
@@ -189,21 +214,9 @@
                     updateUI();
                     console.log("Локально отредактирован до:", count);
                 }
-            }
-
-            if (!isEditMode) {
-                buttonEl.classList.add('hidden');
-                counterEl.classList.add('expanded');
-                messageEl.classList.add('hidden');
-                console.log("Переключено в режим расширенного счётчика");
             } else {
-                counterEl.classList.remove('expanded');
-                counterEl.classList.add('hidden');
-                buttonEl.classList.remove('hidden');
-                buttonEl.classList.add('full-button');
-                console.log("Переключено в режим большой кнопки");
+                console.log("Некорректный ввод, ничего не изменено");
             }
-            isEditMode = !isEditMode;
         }
 
         // Привязка событий
