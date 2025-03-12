@@ -22,25 +22,29 @@
             overflow: hidden;
             transition: all 0.5s ease;
         }
-        h1 {
-            font-size: 30vw;
-            color: #0047BB;
-            -webkit-text-stroke: 4px white;
-            text-stroke: 4px white;
-            transition: all 0.5s ease;
-        }
-        button#clickButton {
-            font-size: 2rem;
-            padding: 15px 30px;
-            border: none;
-            background-color: #0047BB;
-            color: white;
-            border-radius: 30px;
-            max-width: 90%;
-            font-family: 'Junegull', sans-serif;
-            transition: all 0.5s ease;
-        }
-        button#clickButton:disabled { background-color: #666; cursor: not-allowed; }
+    h1 {
+        font-size: 30vw;
+        margin-bottom: 20px;
+        margin: 0;
+        width: 100%;
+        text-align: center;
+        color: #0047BB; /* Тёмно-синий цвет текста */
+        -webkit-text-stroke: 4px white; /* Белая обводка текста */
+        text-stroke: 4px white;
+        font-weight: normal; /* Junegull не имеет вариаций веса */
+    }
+    button#clickButton {
+        font-size: 2rem;
+        padding: 15px 30px;
+        cursor: pointer;
+        border: none;
+        background-color: #0047BB; /* Синий фон кнопки */
+        color: white; /* Белый текст */
+        border-radius: 30px; /* Скруглённые углы */
+        max-width: 90%;
+        font-family: 'Junegull', sans-serif;
+        font-weight: normal;
+    }clickButton:disabled { background-color: #666; cursor: not-allowed; }
         p { font-size: 1.5rem; color: #0047BB; font-family: 'Junegull', sans-serif; }
         #editButton {
             position: absolute;
