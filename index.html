@@ -139,6 +139,14 @@
         }
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .combined-mode h1 {
+            font-size: 20vw; /* Уменьшаем счётчик для совместного отображения */
+            margin-bottom: 20px;
+        }
+        .combined-mode button#clickButton {
+            font-size: min(5vw, 2rem); /* Уменьшаем кнопку */
+            padding: min(4vw, 15px) min(8vw, 30px);
+        }
     </style>
 </head>
 <body>
@@ -193,6 +201,7 @@
         const counterModeButton = document.getElementById('counterMode');
         const buttonModeButton = document.getElementById('buttonMode');
         const resetModeButton = document.getElementById('resetMode');
+        const bodyEl = document.body;
 
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
@@ -270,6 +279,7 @@
         }
 
         function setCounterMode() {
+            bodyEl.classList.remove('combined-mode');
             buttonEl.classList.add('hidden');
             counterEl.classList.remove('hidden');
             counterEl.classList.add('expanded');
@@ -280,6 +290,7 @@
         }
 
         function setButtonMode() {
+            bodyEl.classList.remove('combined-mode');
             counterEl.classList.remove('expanded');
             counterEl.classList.add('hidden');
             buttonEl.classList.remove('hidden');
@@ -291,17 +302,12 @@
         }
 
         function resetToInitial() {
-            count = 500; // Возвращаем начальное значение
-            if (firebaseInitialized) {
-                set(counterRef, count)
-                    .then(() => console.log("Счётчик сброшен до начального значения:", count))
-                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
-            } else {
-                counterEl.textContent = count;
-                console.log("Локально сброшено до:", count);
-            }
-            setCounterMode(); // Возвращаем в режим счётчика
-            updateUI();
+            bodyEl.classList.add('combined-mode');
+            counterEl.classList.remove('hidden', 'expanded');
+            buttonEl.classList.remove('hidden', 'full-button');
+            messageEl.classList.remove('hidden');
+            isEditMode = false;
+            console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
 
@@ -311,7 +317,7 @@
         buttonModeButton.onclick = setButtonMode;
         resetModeButton.onclick = resetToInitial;
 
-        // Инициализация в исходном состоянии
+        // Инициализация: только счётчик при загрузке
         setCounterMode();
         updateUI();
     </script>
