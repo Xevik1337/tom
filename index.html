@@ -22,7 +22,7 @@
             overflow: hidden;
             transition: all 0.5s ease;
         }
-        h1 {
+        h1#mainCounter {
             font-size: 30vw;
             margin: 0;
             width: 100%;
@@ -51,7 +51,6 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            position: relative; /* Для позиционирования счётчика в кнопке */
         }
         .full-button {
             width: 70vw;
@@ -140,7 +139,7 @@
         }
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .combined-mode h1 {
+        .combined-mode h1#mainCounter {
             font-size: 20vw; /* Уменьшаем счётчик для совместного отображения */
             margin-bottom: 20px;
         }
@@ -148,21 +147,21 @@
             font-size: min(5vw, 2rem); /* Уменьшаем кнопку */
             padding: min(4vw, 15px) min(8vw, 30px);
         }
-        .button-counter {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: min(2vw, 1rem); /* Маленький размер счётчика */
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 2px 5px;
-            border-radius: 5px;
+        #buttonCounter {
+            font-size: min(8vw, 4rem); /* Размер соответствует кнопке в режиме full-button */
+            color: #0047BB;
+            -webkit-text-stroke: 2px white;
+            text-stroke: 2px white;
+            margin-bottom: 20px;
+            width: 70vw;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1 id="counter">500</h1>
-    <button id="clickButton">Забрать напиток<span id="buttonCounter" class="button-counter"></span></button>
+    <h1 id="mainCounter">500</h1>
+    <h1 id="buttonCounter" class="hidden">500</h1>
+    <button id="clickButton">Забрать напиток</button>
     <p id="message"></p>
     <details id="editButton">
         <summary>ED</summary>
@@ -204,9 +203,9 @@
 
         let count = 500;
         let isEditMode = false;
-        const counterEl = document.getElementById('counter');
-        const buttonEl = document.getElementById('clickButton');
+        const mainCounterEl = document.getElementById('mainCounter');
         const buttonCounterEl = document.getElementById('buttonCounter');
+        const buttonEl = document.getElementById('clickButton');
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
         const editValueButton = document.getElementById('editValue');
@@ -216,7 +215,7 @@
         const bodyEl = document.body;
 
         // Установите свой PIN-код здесь
-        const correctPin = "1234"; // Замените на нужный четырёхзначный код
+        const correctPin = "1732"; 
 
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
@@ -226,8 +225,8 @@
                         .catch((error) => console.error("Ошибка установки значения:", error));
                 } else {
                     count = snapshot.val();
-                    counterEl.textContent = count;
-                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
+                    mainCounterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем счётчик для кнопки
                     updateUI();
                     console.log("Счётчик загружен из Firebase:", count);
                 }
@@ -235,16 +234,16 @@
 
             onValue(counterRef, (snapshot) => {
                 count = snapshot.val() !== null ? snapshot.val() : 500;
-                counterEl.textContent = count;
-                buttonCounterEl.textContent = count; // Обновляем маленький счётчик
+                mainCounterEl.textContent = count;
+                buttonCounterEl.textContent = count; // Обновляем счётчик для кнопки
                 updateUI();
                 console.log("Счётчик обновлён из Firebase:", count);
             }, (error) => {
                 console.error("Ошибка чтения из Firebase:", error);
             });
         } else {
-            counterEl.textContent = count;
-            buttonCounterEl.textContent = count; // Обновляем маленький счётчик
+            mainCounterEl.textContent = count;
+            buttonCounterEl.textContent = count; // Обновляем счётчик для кнопки
             updateUI();
             console.warn("Firebase не работает, используем локальный режим");
         }
@@ -258,8 +257,8 @@
                         .then(() => console.log("Счётчик уменьшен до:", count))
                         .catch((error) => console.error("Ошибка записи в Firebase:", error));
                 } else {
-                    counterEl.textContent = count;
-                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
+                    mainCounterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем счётчик для кнопки
                     updateUI();
                     console.log("Локально уменьшен до:", count);
                 }
@@ -287,8 +286,8 @@
                         .then(() => console.log("Счётчик отредактирован до:", count))
                         .catch((error) => console.error("Ошибка записи в Firebase:", error));
                 } else {
-                    counterEl.textContent = count;
-                    buttonCounterEl.textContent = count; // Обновляем маленький счётчик
+                    mainCounterEl.textContent = count;
+                    buttonCounterEl.textContent = count; // Обновляем счётчик для кнопки
                     updateUI();
                     console.log("Локально отредактирован до:", count);
                 }
@@ -301,8 +300,9 @@
         function setCounterMode() {
             bodyEl.classList.remove('combined-mode');
             buttonEl.classList.add('hidden');
-            counterEl.classList.remove('hidden');
-            counterEl.classList.add('expanded');
+            buttonCounterEl.classList.add('hidden'); // Скрываем счётчик кнопки
+            mainCounterEl.classList.remove('hidden');
+            mainCounterEl.classList.add('expanded');
             messageEl.classList.add('hidden');
             isEditMode = false;
             console.log("Переключено в режим счётчика");
@@ -311,10 +311,10 @@
 
         function setButtonMode() {
             bodyEl.classList.remove('combined-mode');
-            counterEl.classList.remove('expanded');
-            counterEl.classList.add('hidden');
+            mainCounterEl.classList.add('hidden');
             buttonEl.classList.remove('hidden');
             buttonEl.classList.add('full-button');
+            buttonCounterEl.classList.remove('hidden'); // Показываем счётчик кнопки
             messageEl.classList.remove('hidden');
             isEditMode = true;
             console.log("Переключено в режим кнопки");
@@ -323,7 +323,8 @@
 
         function resetToInitial() {
             bodyEl.classList.add('combined-mode');
-            counterEl.classList.remove('hidden', 'expanded');
+            mainCounterEl.classList.remove('hidden', 'expanded');
+            buttonCounterEl.classList.add('hidden'); // Скрываем счётчик кнопки
             buttonEl.classList.remove('hidden', 'full-button');
             messageEl.classList.remove('hidden');
             isEditMode = false;
