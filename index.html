@@ -83,61 +83,54 @@
             measurementId: "G-6F31PYWZ4H"
         };
 
-        let firebaseInitialized = false;
+        // Инициализируем Firebase
         try {
             firebase.initializeApp(firebaseConfig);
-            firebaseInitialized = true;
             console.log("Firebase успешно инициализирован");
         } catch (error) {
             console.error("Ошибка инициализации Firebase:", error);
+            alert("Не удалось подключиться к Firebase. Проверьте интернет и настройки.");
+            return;
         }
 
-        const db = firebaseInitialized ? firebase.database() : null;
-        const counterRef = db ? db.ref('counter') : null;
+        const db = firebase.database();
+        const counterRef = db.ref('counter');
 
-        let count = 500;
+        let count = 500; // Локальная переменная только для начального отображения
         let isEditMode = false;
         const counterEl = document.getElementById('counter');
         const buttonEl = document.getElementById('clickButton');
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
 
-        // Проверяем, работает ли Firebase
-        if (counterRef) {
-            counterRef.once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    counterRef.set(500)
-                        .then(() => console.log("Установлено начальное значение 500"))
-                        .catch((error) => console.error("Ошибка установки значения:", error));
-                }
-            }).catch((error) => console.error("Ошибка проверки базы:", error));
+        // Устанавливаем начальное значение в Firebase, если его нет
+        counterRef.once('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                counterRef.set(500)
+                    .then(() => console.log("Установлено начальное значение 500 в Firebase"))
+                    .catch((error) => console.error("Ошибка установки начального значения:", error));
+            }
+        }).catch((error) => console.error("Ошибка при проверке базы:", error));
 
-            counterRef.on('value', (snapshot) => {
-                count = snapshot.val() !== null ? snapshot.val() : 500;
-                counterEl.textContent = count;
-                updateUI();
-                console.log("Счётчик обновлён из Firebase:", count);
-            }, (error) => console.error("Ошибка чтения Firebase:", error));
-        } else {
-            console.warn("Firebase не инициализирован, работаем локально");
+        // Синхронизация с Firebase
+        counterRef.on('value', (snapshot) => {
+            count = snapshot.val() !== null ? snapshot.val() : 500;
             counterEl.textContent = count;
             updateUI();
-        }
+            console.log("Счётчик обновлён из Firebase:", count);
+        }, (error) => {
+            console.error("Ошибка чтения из Firebase:", error);
+            alert("Ошибка чтения данных из Firebase. Проверьте консоль.");
+        });
 
-        // Функция уменьшения счётчика
+        // Уменьшение счётчика
         function decreaseCounter() {
             console.log("Кнопка 'Забрать напиток' нажата");
             if (count > 0) {
                 count--;
-                if (counterRef) {
-                    counterRef.set(count)
-                        .then(() => console.log("Счётчик уменьшен до:", count))
-                        .catch((error) => console.error("Ошибка записи в Firebase:", error));
-                } else {
-                    counterEl.textContent = count;
-                    updateUI();
-                    console.log("Локальное уменьшение счётчика до:", count);
-                }
+                counterRef.set(count)
+                    .then(() => console.log("Счётчик уменьшен до:", count))
+                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
             }
         }
 
@@ -153,9 +146,20 @@
             }
         }
 
-        // Переключение режима
-        function toggleMode() {
+        // Переключение режима и редактирование
+        function editAndToggleMode() {
             console.log("Кнопка 'ED' нажата, текущий режим:", isEditMode);
+
+            // Запрашиваем новое значение счётчика
+            const newCount = prompt("Отредактировать количество напитков (оставьте пустым для переключения режима):", count);
+            if (newCount !== null && newCount !== "" && !isNaN(newCount) && newCount >= 0) {
+                count = parseInt(newCount);
+                counterRef.set(count)
+                    .then(() => console.log("Счётчик отредактирован до:", count))
+                    .catch((error) => console.error("Ошибка редактирования в Firebase:", error));
+            }
+
+            // Переключаем режим
             if (!isEditMode) {
                 buttonEl.classList.add('hidden');
                 counterEl.classList.add('expanded');
@@ -171,28 +175,9 @@
             isEditMode = !isEditMode;
         }
 
-        // Редактирование счётчика
-        function editCounter() {
-            console.log("Двойной клик по 'ED'");
-            const newCount = prompt("Отредактировать количество напитков:", count);
-            if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
-                count = parseInt(newCount);
-                if (counterRef) {
-                    counterRef.set(count)
-                        .then(() => console.log("Счётчик отредактирован до:", count))
-                        .catch((error) => console.error("Ошибка редактирования:", error));
-                } else {
-                    counterEl.textContent = count;
-                    updateUI();
-                    console.log("Локально отредактирован счётчик до:", count);
-                }
-            }
-        }
-
         // Привязка событий
         buttonEl.onclick = decreaseCounter;
-        editButtonEl.onclick = toggleMode;
-        editButtonEl.ondblclick = editCounter;
+        editButtonEl.onclick = editAndToggleMode;
 
         // Инициализация интерфейса
         updateUI();
