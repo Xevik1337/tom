@@ -25,8 +25,8 @@
         h1 {
             font-size: 30vw;
             color: #0047BB;
-            /* Убрана обводка, если она не нужна */
-            /* -webkit-text-stroke: 4px white; */
+            -webkit-text-stroke: 4px white; /* Вернули обводку */
+            text-stroke: 4px white; /* Для совместимости */
             transition: all 0.5s ease;
         }
         button#clickButton {
@@ -82,7 +82,15 @@
             appId: "1:805956552785:web:11e9369f282abb25081070",
             measurementId: "G-6F31PYWZ4H"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        // Инициализируем Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase успешно инициализирован");
+        } catch (error) {
+            console.error("Ошибка инициализации Firebase:", error);
+        }
+
         const db = firebase.database();
         const counterRef = db.ref('counter');
 
@@ -95,21 +103,28 @@
         // Устанавливаем начальное значение в Firebase, если его нет
         counterRef.once('value', (snapshot) => {
             if (!snapshot.exists()) {
-                counterRef.set(500); // Устанавливаем 500 как начальное значение
+                counterRef.set(500)
+                    .then(() => console.log("Начальное значение 500 установлено в Firebase"))
+                    .catch((error) => console.error("Ошибка установки начального значения:", error));
             }
-        });
+        }).catch((error) => console.error("Ошибка при проверке начального значения:", error));
 
         // Синхронизация с Firebase
         counterRef.on('value', (snapshot) => {
             count = snapshot.val() !== null ? snapshot.val() : 500;
             counterEl.textContent = count;
             updateUI();
+            console.log("Значение счётчика обновлено из Firebase:", count);
+        }, (error) => {
+            console.error("Ошибка чтения из Firebase:", error);
         });
 
         function decreaseCounter() {
             if (count > 0) {
                 count--;
-                counterRef.set(count); // Обновляем значение в Firebase
+                counterRef.set(count)
+                    .then(() => console.log("Счётчик уменьшен до:", count))
+                    .catch((error) => console.error("Ошибка при уменьшении счётчика:", error));
             }
         }
 
@@ -128,12 +143,13 @@
                 buttonEl.classList.add('hidden');
                 counterEl.classList.add('expanded');
                 messageEl.classList.add('hidden');
+                console.log("Режим переключён: счётчик расширен");
             } else {
                 counterEl.classList.remove('expanded');
                 counterEl.classList.add('hidden');
                 buttonEl.classList.remove('hidden');
                 buttonEl.classList.add('full-button');
-                messageEl.classList.add('hidden');
+                console.log("Режим переключён: кнопка увеличена");
             }
             isEditMode = !isEditMode;
         }
@@ -142,11 +158,13 @@
             const newCount = prompt("Отредактировать количество напитков:", count);
             if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
                 count = parseInt(newCount);
-                counterRef.set(count); // Обновляем значение в Firebase
+                counterRef.set(count)
+                    .then(() => console.log("Счётчик отредактирован до:", count))
+                    .catch((error) => console.error("Ошибка при редактировании счётчика:", error));
             }
         }
 
-        // Привязываем editCounter к двойному клику напрямую
+        // Привязываем editCounter к двойному клику
         document.getElementById('editButton').ondblclick = editCounter;
 
         // Инициализируем интерфейс
