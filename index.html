@@ -2,25 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Отключаем масштабирование при двойном тапе или жестах -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Счётчик напитков</title>
     <style>
-        /* Подключаем шрифт Junegull */
         @font-face {
             font-family: 'Junegull';
             src: url('Junegull.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
         }
-
-        /* Общие стили для всего документа */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             display: flex;
             flex-direction: column;
@@ -29,51 +18,29 @@
             height: 100vh;
             width: 100vw;
             font-family: 'Junegull', sans-serif;
-            text-align: center;
-            background-color: #F4A6D7; /* Светло-розовый фон */
+            background-color: #F4A6D7;
             overflow: hidden;
-            touch-action: manipulation; 
+            transition: all 0.5s ease;
         }
-
         h1 {
             font-size: 30vw;
-            margin-bottom: 20px;
-            margin: 0;
-            width: 100%;
-            text-align: center;
-            color: #0047BB; /* Тёмно-синий цвет текста */
-            -webkit-text-stroke: 4px white; /* Белая обводка текста */
-            text-stroke: 4px white;
-            font-weight: normal; /* Junegull не имеет вариаций веса */
+            color: #0047BB;
+            -webkit-text-stroke: 4px white;
+            transition: all 0.5s ease;
         }
-
         button#clickButton {
             font-size: 2rem;
             padding: 15px 30px;
-            cursor: pointer;
             border: none;
-            background-color: #0047BB; /* Синий фон кнопки */
-            color: white; /* Белый текст */
-            border-radius: 30px; /* Скруглённые углы */
+            background-color: #0047BB;
+            color: white;
+            border-radius: 30px;
             max-width: 90%;
             font-family: 'Junegull', sans-serif;
-            font-weight: normal;
+            transition: all 0.5s ease;
         }
-
-        button#clickButton:disabled {
-            background-color: #666; /* Серый фон для отключённой кнопки */
-            cursor: not-allowed;
-        }
-
-        p {
-            font-size: 1.5rem;
-            margin-top: 20px;
-            width: 100%;
-            color: #0047BB; /* Тёмно-синий цвет текста */
-            font-family: 'Junegull', sans-serif;
-            font-weight: normal;
-        }
-
+        button#clickButton:disabled { background-color: #666; cursor: not-allowed; }
+        p { font-size: 1.5rem; color: #0047BB; font-family: 'Junegull', sans-serif; }
         #editButton {
             position: absolute;
             top: 10px;
@@ -81,56 +48,97 @@
             font-size: 1rem;
             padding: 10px;
             background-color: transparent;
-            color: #0047BB; /* Синий цвет */
+            color: #0047BB;
             border: none;
-            cursor: pointer;
             opacity: 0.5;
             font-family: 'Junegull', sans-serif;
-            font-weight: normal;
         }
-
-        #editButton:hover {
-            opacity: 1;
-        }
+        #editButton:hover { opacity: 1; }
+        .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
+        .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .full-button { width: 80%; height: 60%; font-size: 4rem; }
     </style>
 </head>
 <body>
     <h1 id="counter">500</h1>
     <button id="clickButton" onclick="decreaseCounter()">Забрать напиток</button>
     <p id="message"></p>
+    <button id="editButton" onclick="toggleMode()">ED</button>
 
-    <!-- Кнопка для редактирования -->
-    <button id="editButton" onclick="editCounter()">ED</button>
+    <!-- Подключаем Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
     <script>
-        // Считываем сохранённое значение из LocalStorage
-        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 500;
+        // Инициализация Firebase (замените на свои данные)
+        const firebaseConfig = {
+         apiKey: "AIzaSyABGFrmc4SRwuuQIkdEWhydg-ru19O0ROk",
+         authDomain: "tomi-348c8.firebaseapp.com",
+         databaseURL: "https://tomi-348c8-default-rtdb.europe-west1.firebasedatabase.app",
+         projectId: "tomi-348c8",
+         storageBucket: "tomi-348c8.firebasestorage.app",
+         messagingSenderId: "805956552785",
+         appId: "1:805956552785:web:11e9369f282abb25081070",
+         measurementId: "G-6F31PYWZ4H"
+         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const counterRef = db.ref('counter');
 
-        // Обновляем счётчик на странице
-        document.getElementById('counter').textContent = count;
+        let count = 500;
+        let isEditMode = false;
+        const counterEl = document.getElementById('counter');
+        const buttonEl = document.getElementById('clickButton');
+        const messageEl = document.getElementById('message');
+
+        // Синхронизация с Firebase
+        counterRef.on('value', (snapshot) => {
+            count = snapshot.val() || 500;
+            counterEl.textContent = count;
+            updateUI();
+        });
 
         function decreaseCounter() {
             if (count > 0) {
                 count--;
-                // Сохраняем новое значение в LocalStorage
-                localStorage.setItem('counter', count);
-                document.getElementById('counter').textContent = count;
-                if (count === 0) {
-                    document.getElementById('message').textContent = "Все напитки, к сожалению, уже раздали.";
-                    document.getElementById('clickButton').disabled = true;
-                }
+                counterRef.set(count);
             }
         }
 
-        // Функция для редактирования счётчика
+        function updateUI() {
+            if (count === 0) {
+                messageEl.textContent = "Все напитки, к сожалению, уже раздали.";
+                buttonEl.disabled = true;
+            } else {
+                messageEl.textContent = "";
+                buttonEl.disabled = false;
+            }
+        }
+
+        function toggleMode() {
+            if (!isEditMode) {
+                buttonEl.classList.add('hidden');
+                counterEl.classList.add('expanded');
+                messageEl.classList.add('hidden');
+            } else {
+                counterEl.classList.remove('expanded');
+                counterEl.classList.add('hidden');
+                buttonEl.classList.remove('hidden');
+                buttonEl.classList.add('full-button');
+                messageEl.classList.add('hidden');
+            }
+            isEditMode = !isEditMode;
+
+            setTimeout(() => {
+                document.getElementById('editButton').ondblclick = editCounter;
+            }, 100);
+        }
+
         function editCounter() {
             const newCount = prompt("Отредактировать количество напитков:", count);
             if (newCount !== null && !isNaN(newCount) && newCount >= 0) {
                 count = parseInt(newCount);
-                localStorage.setItem('counter', count);
-                document.getElementById('counter').textContent = count;
-                document.getElementById('message').textContent = ""; // Очищаем сообщение
-                document.getElementById('clickButton').disabled = false; // Включаем кнопку, если счётчик больше 0
+                counterRef.set(count);
             }
         }
     </script>
