@@ -59,15 +59,6 @@
             padding: min(4vw, 30px);
             border-radius: 10px;
         }
-        #buttonCounter {
-            font-size: 30vw; /* Размер текста счётчика в кнопке */
-            color: #0047BB;
-            -webkit-text-stroke: 2px white;
-            text-stroke: 2px white;
-            margin-bottom: 20px;
-            text-align: center;
-            transition: font-size 0.3s ease;
-        }
         @media (max-width: 1024px) {
             .full-button {
                 width: 60vw;
@@ -149,12 +140,21 @@
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
         .combined-mode h1#mainCounter {
-            font-size: 20vw; /* Уменьшаем счётчик для совместного отображения */
+            font-size: 10vw; /* Уменьшаем счётчик для совместного отображения */
             margin-bottom: 20px;
         }
         .combined-mode button#clickButton {
             font-size: min(5vw, 2rem); /* Уменьшаем кнопку */
             padding: min(4vw, 15px) min(8vw, 30px);
+        }
+        #buttonCounter {
+            font-size: min(8vw, 4rem); /* Размер соответствует кнопке в режиме full-button */
+            color: #0047BB;
+            -webkit-text-stroke: 2px white;
+            text-stroke: 2px white;
+            margin-bottom: 20px;
+            width: 70vw;
+            text-align: center;
         }
     </style>
 </head>
@@ -337,20 +337,45 @@
 
         // Запрос PIN-кода при клике на ED
         editButtonEl.querySelector('summary').addEventListener('click', function(event) {
-            event.preventDefault(); // Предотвращаем стандартное раскрытие
-            const enteredPin = prompt("Введите PIN-код для редактирования:");
-            if (enteredPin === correctPin) {
-                editButtonEl.setAttribute('open', true);
-            } else {
-                alert("Неверный PIN-код.");
+            if (!editButtonEl.hasAttribute('open')) { // Проверяем, закрыто ли меню
+                const pin = prompt("Введите четырёхзначный PIN-код:");
+                if (pin === null || pin.length !== 4 || pin !== correctPin) {
+                    alert("Неверный PIN-код!");
+                    event.preventDefault(); // Предотвращаем открытие меню
+                }
             }
         });
 
-        buttonEl.addEventListener('click', decreaseCounter);
-        editValueButton.addEventListener('click', editCounter);
-        counterModeButton.addEventListener('click', setCounterMode);
-        buttonModeButton.addEventListener('click', setButtonMode);
-        resetModeButton.addEventListener('click', resetToInitial);
+        // Закрытие меню при клике вне его
+        document.addEventListener('click', function(event) {
+            if (!editButtonEl.contains(event.target)) {
+                editButtonEl.removeAttribute('open');
+            }
+        });
+
+        // Восстановление сохранённого состояния
+        function restoreState() {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'counter') {
+                setCounterMode();
+            } else if (savedMode === 'button') {
+                setButtonMode();
+            } else if (savedMode === 'combined') {
+                resetToInitial();
+            } else {
+                resetToInitial(); // По умолчанию, если нет сохранённого состояния
+            }
+        }
+
+        buttonEl.onclick = decreaseCounter;
+        editValueButton.onclick = editCounter;
+        counterModeButton.onclick = setCounterMode;
+        buttonModeButton.onclick = setButtonMode;
+        resetModeButton.onclick = resetToInitial;
+
+        // Инициализация: восстановление сохранённого состояния
+        restoreState();
+        updateUI();
     </script>
 </body>
 </html>
