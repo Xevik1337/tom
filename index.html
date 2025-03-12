@@ -32,23 +32,24 @@
             text-stroke: 4px white;
             font-weight: normal;
         }
-        button#clickButton {
-            font-size: 1.5rem; /* Уменьшен размер шрифта */
-            padding: 10px 20px; /* Уменьшены отступы */
-            cursor: pointer;
-            border: none;
-            background-color: #0047BB;
-            color: white;
-            border-radius: 20px; /* Уменьшен радиус */
-            font-family: 'Junegull', sans-serif;
-            font-weight: normal;
-            position: relative; /* Центрирование */
-            margin-top: 20px; /* Отступ сверху для центрирования */
-        }
-        button#clickButton:disabled {
-            background-color: #666;
-            cursor: not-allowed;
-        }
+    button#clickButton {
+        font-size: 2rem;
+        padding: 15px 30px;
+        cursor: pointer;
+        border: none;
+        background-color: #0047BB; /* Синий фон кнопки */
+        color: white; /* Белый текст */
+        border-radius: 30px; /* Скруглённые углы */
+        max-width: 90%;
+        font-family: 'Junegull', sans-serif;
+        font-weight: normal;
+    }
+
+    button#clickButton:disabled {
+        background-color: #666; /* Серый фон для отключённой кнопки */
+        cursor: not-allowed;
+    }
+
         p { 
             font-size: 1.5rem; 
             color: #0047BB; 
