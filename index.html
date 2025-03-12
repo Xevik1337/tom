@@ -32,23 +32,36 @@
             text-stroke: 4px white;
             font-weight: normal;
         }
-    button#clickButton {
-        font-size: 6rem;
-        padding: 60px 75px;
-        cursor: pointer;
-        border: none;
-        background-color: #0047BB; /* Синий фон кнопки */
-        color: white; /* Белый текст */
-        border-radius: 30px; /* Скруглённые углы */
-        max-width: 90%;
-        font-family: 'Junegull', sans-serif;
-        font-weight: normal;
-    }
+button#clickButton {
+    font-size: 6rem;
+    padding: 60px 75px;
+    cursor: pointer;
+    border: none;
+    background-color: #0047BB;
+    color: white;
+    border-radius: 30px;
+    max-width: 90%;
+    font-family: 'Junegull', sans-serif;
+    font-weight: normal;
+    transition: all 0.3s ease;
+}
 
-    button#clickButton:disabled {
-        background-color: #666; /* Серый фон для отключённой кнопки */
-        cursor: not-allowed;
-    }
+button#clickButton:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+}
+
+.full-button { 
+    font-size: 10vw;
+    width: 90vw;
+    height: 90vh;
+    padding: 5vh;
+    border-radius: 10vw;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
         p { 
             font-size: 1.5rem; 
