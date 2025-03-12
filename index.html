@@ -51,6 +51,7 @@ button#clickButton:disabled {
     cursor: not-allowed;
 }
 
+/* Полноэкранная кнопка в режиме "кнопки" */
 .full-button { 
     font-size: 10vw;
     width: 90vw;
@@ -61,6 +62,34 @@ button#clickButton:disabled {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Медиазапросы для адаптации под мобильные и планшеты */
+@media (max-width: 1024px) { /* Планшеты */
+    .full-button {
+        font-size: 8vw;
+        width: 85vw;
+        height: 85vh;
+        padding: 4vh;
+    }
+}
+
+@media (max-width: 768px) { /* Смартфоны */
+    .full-button {
+        font-size: 7vw;
+        width: 80vw;
+        height: 80vh;
+        padding: 3vh;
+    }
+}
+
+@media (max-width: 480px) { /* Маленькие смартфоны */
+    .full-button {
+        font-size: 6vw;
+        width: 75vw;
+        height: 75vh;
+        padding: 2vh;
+    }
 }
 
         p { 
