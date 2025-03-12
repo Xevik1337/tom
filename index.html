@@ -99,49 +99,39 @@
             opacity: 0.5;
             font-family: 'Junegull', sans-serif;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         #editButton:hover { opacity: 1; }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
+        details summary {
+            outline: none;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 20px;
         }
-        .slider:before {
+        details[open] summary {
+            opacity: 0.7;
+        }
+        details menu {
             position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #0047BB;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 0;
+            list-style: none;
         }
-        input:checked + .slider {
-            background-color: #0047BB;
+        details menu button {
+            display: block;
+            width: 100%;
+            padding: 5px 10px;
+            background: none;
+            border: none;
+            color: #0047BB;
+            text-align: left;
+            font-family: 'Junegull', sans-serif;
+            cursor: pointer;
         }
-        input:checked + .slider:before {
-            transform: translateX(20px);
+        details menu button:hover {
+            background-color: rgba(0, 71, 187, 0.1);
         }
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
@@ -151,13 +141,14 @@
     <h1 id="counter">500</h1>
     <button id="clickButton">Забрать напиток</button>
     <p id="message"></p>
-    <button id="editButton">
-        ED
-        <label class="switch">
-            <input type="checkbox" id="modeToggle">
-            <span class="slider"></span>
-        </label>
-    </button>
+    <details id="editButton">
+        <summary>ED</summary>
+        <menu>
+            <button id="editValue">Редактировать значение</button>
+            <button id="counterMode">Режим счётчика</button>
+            <button id="buttonMode">Режим кнопки</button>
+        </menu>
+    </details>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
@@ -193,7 +184,9 @@
         const buttonEl = document.getElementById('clickButton');
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
-        const modeToggle = document.getElementById('modeToggle');
+        const editValueButton = document.getElementById('editValue');
+        const counterModeButton = document.getElementById('counterMode');
+        const buttonModeButton = document.getElementById('buttonMode');
 
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
@@ -250,34 +243,6 @@
             }
         }
 
-        function setCounterMode() {
-            buttonEl.classList.add('hidden');
-            counterEl.classList.remove('hidden');
-            counterEl.classList.add('expanded');
-            messageEl.classList.add('hidden');
-            isEditMode = false;
-            console.log("Переключено в режим счётчика");
-        }
-
-        function setButtonMode() {
-            counterEl.classList.remove('expanded');
-            counterEl.classList.add('hidden');
-            buttonEl.classList.remove('hidden');
-            buttonEl.classList.add('full-button');
-            messageEl.classList.remove('hidden');
-            isEditMode = true;
-            console.log("Переключено в режим кнопки");
-        }
-
-        function toggleMode(e) {
-            e.stopPropagation(); // Предотвращаем срабатывание editCounter
-            if (modeToggle.checked) {
-                setButtonMode();
-            } else {
-                setCounterMode();
-            }
-        }
-
         function editCounter() {
             const input = prompt("Введите новое значение счётчика:", count);
             if (input === null) return;
@@ -295,15 +260,34 @@
             } else {
                 console.log("Некорректный ввод, ничего не изменено");
             }
+            editButtonEl.removeAttribute('open'); // Закрываем меню после выбора
+        }
+
+        function setCounterMode() {
+            buttonEl.classList.add('hidden');
+            counterEl.classList.remove('hidden');
+            counterEl.classList.add('expanded');
+            messageEl.classList.add('hidden');
+            isEditMode = false;
+            console.log("Переключено в режим счётчика");
+            editButtonEl.removeAttribute('open'); // Закрываем меню после выбора
+        }
+
+        function setButtonMode() {
+            counterEl.classList.remove('expanded');
+            counterEl.classList.add('hidden');
+            buttonEl.classList.remove('hidden');
+            buttonEl.classList.add('full-button');
+            messageEl.classList.remove('hidden');
+            isEditMode = true;
+            console.log("Переключено в режим кнопки");
+            editButtonEl.removeAttribute('open'); // Закрываем меню после выбора
         }
 
         buttonEl.onclick = decreaseCounter;
-        modeToggle.onchange = toggleMode;
-        editButtonEl.onclick = editCounter;
-
-        // Инициализация в режиме счётчика по умолчанию
-        setCounterMode();
-        modeToggle.checked = false;
+        editValueButton.onclick = editCounter;
+        counterModeButton.onclick = setCounterMode;
+        buttonModeButton.onclick = setButtonMode;
 
         updateUI();
     </script>
