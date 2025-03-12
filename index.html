@@ -33,65 +33,57 @@
             font-weight: normal;
         }
 button#clickButton {
-    font-size: 6rem;
-    padding: 60px 75px;
+    font-size: min(8vw, 4rem); /* Размер шрифта зависит от экрана */
+    padding: min(10vw, 50px); /* Динамические отступы */
     cursor: pointer;
     border: none;
     background-color: #0047BB;
     color: white;
-    border-radius: 30px;
-    max-width: 90%;
+    border-radius: 15px;
+    max-width: 90vw;
+    max-height: 90vh;
     font-family: 'Junegull', sans-serif;
     font-weight: normal;
     transition: all 0.3s ease;
-}
-
-button#clickButton:disabled {
-    background-color: #666;
-    cursor: not-allowed;
-}
-
-/* Полноэкранная кнопка в режиме "кнопки" */
-.full-button { 
-    font-size: 10vw;
-    width: 90vw;
-    height: 90vh;
-    padding: 5vh;
-    border-radius: 10vw;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
-/* Медиазапросы для адаптации под мобильные и планшеты */
+/* Полноэкранный режим */
+.full-button {
+    width: 95vw;
+    height: 95vh;
+    font-size: min(12vw, 6rem);
+    padding: min(10vw, 5vh);
+    border-radius: min(10vw, 50px);
+}
+
+/* Медиазапросы для адаптации */
 @media (max-width: 1024px) { /* Планшеты */
     .full-button {
-        font-size: 8vw;
-        width: 85vw;
-        height: 85vh;
-        padding: 4vh;
+        width: 90vw;
+        height: 90vh;
+        font-size: min(10vw, 5rem);
     }
 }
 
 @media (max-width: 768px) { /* Смартфоны */
     .full-button {
-        font-size: 7vw;
-        width: 80vw;
-        height: 80vh;
-        padding: 3vh;
+        width: 85vw;
+        height: 85vh;
+        font-size: min(9vw, 4rem);
     }
 }
 
 @media (max-width: 480px) { /* Маленькие смартфоны */
     .full-button {
-        font-size: 6vw;
-        width: 75vw;
-        height: 75vh;
-        padding: 2vh;
+        width: 80vw;
+        height: 80vh;
+        font-size: min(8vw, 3.5rem);
     }
 }
-
         p { 
             font-size: 1.5rem; 
             color: #0047BB; 
