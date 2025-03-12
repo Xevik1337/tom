@@ -92,15 +92,17 @@
 
         // Инициализация Firebase
         let app, db, counterRef;
+        let firebaseInitialized = false;
         try {
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
             counterRef = ref(db, 'counter');
+            firebaseInitialized = true;
             console.log("Firebase успешно инициализирован");
         } catch (error) {
             console.error("Ошибка инициализации Firebase:", error);
-            alert("Не удалось подключиться к Firebase. Проверьте консоль и интернет.");
-            return;
+            alert("Не удалось подключиться к Firebase. Кнопки будут работать локально.");
+            // Убираем return, продолжаем выполнение
         }
 
         let count = 500;
@@ -110,39 +112,52 @@
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
 
-        // Устанавливаем начальное значение, если его нет
-        onValue(counterRef, (snapshot) => {
-            if (!snapshot.exists()) {
-                set(counterRef, 500)
-                    .then(() => console.log("Установлено начальное значение 500"))
-                    .catch((error) => console.error("Ошибка установки значения:", error));
-            } else {
-                count = snapshot.val();
+        // Инициализация Firebase и синхронизация
+        if (firebaseInitialized) {
+            // Устанавливаем начальное значение, если его нет
+            onValue(counterRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    set(counterRef, 500)
+                        .then(() => console.log("Установлено начальное значение 500"))
+                        .catch((error) => console.error("Ошибка установки значения:", error));
+                } else {
+                    count = snapshot.val();
+                    counterEl.textContent = count;
+                    updateUI();
+                    console.log("Счётчик загружен из Firebase:", count);
+                }
+            }, { onlyOnce: true });
+
+            // Синхронизация с Firebase
+            onValue(counterRef, (snapshot) => {
+                count = snapshot.val() !== null ? snapshot.val() : 500;
                 counterEl.textContent = count;
                 updateUI();
-                console.log("Счётчик загружен из Firebase:", count);
-            }
-        }, { onlyOnce: true });
-
-        // Синхронизация с Firebase
-        onValue(counterRef, (snapshot) => {
-            count = snapshot.val() !== null ? snapshot.val() : 500;
+                console.log("Счётчик обновлён из Firebase:", count);
+            }, (error) => {
+                console.error("Ошибка чтения из Firebase:", error);
+            });
+        } else {
+            // Локальная инициализация, если Firebase не работает
             counterEl.textContent = count;
             updateUI();
-            console.log("Счётчик обновлён из Firebase:", count);
-        }, (error) => {
-            console.error("Ошибка чтения из Firebase:", error);
-            alert("Ошибка чтения данных. Проверьте консоль.");
-        });
+            console.warn("Firebase не работает, используем локальный режим");
+        }
 
         // Уменьшение счётчика
         function decreaseCounter() {
             console.log("Кнопка 'Забрать напиток' нажата, текущий count:", count);
             if (count > 0) {
                 count--;
-                set(counterRef, count)
-                    .then(() => console.log("Счётчик уменьшен до:", count))
-                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
+                if (firebaseInitialized) {
+                    set(counterRef, count)
+                        .then(() => console.log("Счётчик уменьшен до:", count))
+                        .catch((error) => console.error("Ошибка записи в Firebase:", error));
+                } else {
+                    counterEl.textContent = count;
+                    updateUI();
+                    console.log("Локально уменьшен до:", count);
+                }
             }
         }
 
@@ -165,9 +180,15 @@
             const newCount = prompt("Отредактировать количество напитков (оставьте пустым для переключения режима):", count);
             if (newCount !== null && newCount !== "" && !isNaN(newCount) && newCount >= 0) {
                 count = parseInt(newCount);
-                set(counterRef, count)
-                    .then(() => console.log("Счётчик отредактирован до:", count))
-                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
+                if (firebaseInitialized) {
+                    set(counterRef, count)
+                        .then(() => console.log("Счётчик отредактирован до:", count))
+                        .catch((error) => console.error("Ошибка записи в Firebase:", error));
+                } else {
+                    counterEl.textContent = count;
+                    updateUI();
+                    console.log("Локально отредактирован до:", count);
+                }
             }
 
             if (!isEditMode) {
