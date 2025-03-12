@@ -44,7 +44,7 @@
             font-family: 'Junegull', sans-serif;
             font-weight: normal;
         }
-        button#clickButton:disabled { /* Исправлен селектор */
+        button#clickButton:disabled {
             background-color: #666;
             cursor: not-allowed;
         }
@@ -73,12 +73,13 @@
     <p id="message"></p>
     <button id="editButton">ED</button>
 
-    <!-- Подключаем Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <!-- Подключаем Firebase (модульный SDK) -->
+    <script type="module">
+        // Импорт Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
-    <script>
-        // Инициализация Firebase
+        // Конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyABGFrmc4SRwuuQIkdEWhydg-ru19O0ROk",
             authDomain: "tomi-348c8.firebaseapp.com",
@@ -90,15 +91,17 @@
             measurementId: "G-6F31PYWZ4H"
         };
 
-        let db, counterRef;
+        // Инициализация Firebase
+        let app, db, counterRef;
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            counterRef = db.ref('counter');
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            counterRef = ref(db, 'counter');
             console.log("Firebase успешно инициализирован");
         } catch (error) {
             console.error("Ошибка инициализации Firebase:", error);
-            alert("Не удалось подключиться к Firebase. Работаем локально.");
+            alert("Не удалось подключиться к Firebase. Проверьте консоль и интернет.");
+            return;
         }
 
         let count = 500;
@@ -108,45 +111,39 @@
         const messageEl = document.getElementById('message');
         const editButtonEl = document.getElementById('editButton');
 
-        // Инициализация Firebase и синхронизация
-        if (counterRef) {
-            counterRef.once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    counterRef.set(500)
-                        .then(() => console.log("Установлено начальное значение 500 в Firebase"))
-                        .catch((error) => console.error("Ошибка установки начального значения:", error));
-                }
-            }).catch((error) => console.error("Ошибка проверки базы:", error));
-
-            counterRef.on('value', (snapshot) => {
-                count = snapshot.val() !== null ? snapshot.val() : 500;
+        // Устанавливаем начальное значение, если его нет
+        onValue(counterRef, (snapshot) => {
+            if (!snapshot.exists()) {
+                set(counterRef, 500)
+                    .then(() => console.log("Установлено начальное значение 500"))
+                    .catch((error) => console.error("Ошибка установки значения:", error));
+            } else {
+                count = snapshot.val();
                 counterEl.textContent = count;
                 updateUI();
-                console.log("Счётчик обновлён из Firebase:", count);
-            }, (error) => {
-                console.error("Ошибка чтения из Firebase:", error);
-                alert("Ошибка чтения данных из Firebase. Проверьте консоль.");
-            });
-        } else {
-            console.warn("Firebase не работает, используем локальное значение");
+                console.log("Счётчик загружен из Firebase:", count);
+            }
+        }, { onlyOnce: true });
+
+        // Синхронизация с Firebase
+        onValue(counterRef, (snapshot) => {
+            count = snapshot.val() !== null ? snapshot.val() : 500;
             counterEl.textContent = count;
             updateUI();
-        }
+            console.log("Счётчик обновлён из Firebase:", count);
+        }, (error) => {
+            console.error("Ошибка чтения из Firebase:", error);
+            alert("Ошибка чтения данных. Проверьте консоль.");
+        });
 
         // Уменьшение счётчика
         function decreaseCounter() {
             console.log("Кнопка 'Забрать напиток' нажата, текущий count:", count);
             if (count > 0) {
                 count--;
-                if (counterRef) {
-                    counterRef.set(count)
-                        .then(() => console.log("Счётчик уменьшен до:", count))
-                        .catch((error) => console.error("Ошибка записи в Firebase:", error));
-                } else {
-                    counterEl.textContent = count;
-                    updateUI();
-                    console.log("Локально уменьшен до:", count);
-                }
+                set(counterRef, count)
+                    .then(() => console.log("Счётчик уменьшен до:", count))
+                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
             }
         }
 
@@ -169,15 +166,9 @@
             const newCount = prompt("Отредактировать количество напитков (оставьте пустым для переключения режима):", count);
             if (newCount !== null && newCount !== "" && !isNaN(newCount) && newCount >= 0) {
                 count = parseInt(newCount);
-                if (counterRef) {
-                    counterRef.set(count)
-                        .then(() => console.log("Счётчик отредактирован до:", count))
-                        .catch((error) => console.error("Ошибка редактирования в Firebase:", error));
-                } else {
-                    counterEl.textContent = count;
-                    updateUI();
-                    console.log("Локально отредактирован до:", count);
-                }
+                set(counterRef, count)
+                    .then(() => console.log("Счётчик отредактирован до:", count))
+                    .catch((error) => console.error("Ошибка записи в Firebase:", error));
             }
 
             if (!isEditMode) {
