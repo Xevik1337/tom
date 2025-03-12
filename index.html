@@ -31,61 +31,56 @@
             -webkit-text-stroke: 4px white;
             text-stroke: 4px white;
             font-weight: normal;
+            cursor: pointer; /* Добавляем курсор для указания кликабельности */
         }
-button#clickButton {
-    font-size: min(6vw, 3rem); /* Ограниченный динамический размер шрифта */
-    padding: min(5vw, 20px) min(10vw, 40px); /* Адаптивные отступы */
-    cursor: pointer;
-    border: none;
-    background-color: #0047BB;
-    color: white;
-    border-radius: 15px;
-    width: auto;
-    height: auto;
-    max-width: 80vw;
-    max-height: 15vh;
-    font-family: 'Junegull', sans-serif;
-    font-weight: normal;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* Полноэкранный режим кнопки */
-.full-button {
-    width: 70vw;
-    height: 20vh;
-    font-size: min(8vw, 4rem);
-    padding: min(4vw, 30px);
-    border-radius: 10px;
-}
-
-/* Медиазапросы для адаптации */
-@media (max-width: 1024px) { /* Планшеты */
-    .full-button {
-        width: 60vw;
-        height: 15vh;
-        font-size: min(7vw, 3rem);
-    }
-}
-
-@media (max-width: 768px) { /* Смартфоны */
-    .full-button {
-        width: 55vw;
-        height: 12vh;
-        font-size: min(6vw, 2.5rem);
-    }
-}
-
-@media (max-width: 480px) { /* Маленькие смартфоны */
-    .full-button {
-        width: 50vw;
-        height: 10vh;
-        font-size: min(5vw, 2rem);
-    }
-}
+        button#clickButton {
+            font-size: min(6vw, 3rem);
+            padding: min(5vw, 20px) min(10vw, 40px);
+            cursor: pointer;
+            border: none;
+            background-color: #0047BB;
+            color: white;
+            border-radius: 15px;
+            width: auto;
+            height: auto;
+            max-width: 80vw;
+            max-height: 15vh;
+            font-family: 'Junegull', sans-serif;
+            font-weight: normal;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .full-button {
+            width: 70vw;
+            height: 20vh;
+            font-size: min(8vw, 4rem);
+            padding: min(4vw, 30px);
+            border-radius: 10px;
+        }
+        @media (max-width: 1024px) {
+            .full-button {
+                width: 60vw;
+                height: 15vh;
+                font-size: min(7vw, 3rem);
+            }
+        }
+        @media (max-width: 768px) {
+            .full-button {
+                width: 55vw;
+                height: 12vh;
+                font-size: min(6vw, 2.5rem);
+            }
+        }
+        @media (max-width: 480px) {
+            .full-button {
+                width: 50vw;
+                height: 10vh;
+                font-size: min(5vw, 2rem);
+            }
+        }
         p { 
             font-size: 1.5rem; 
             color: #0047BB; 
@@ -93,10 +88,14 @@ button#clickButton {
             text-align: center; 
             margin-top: 10px; 
         }
-        #editButton {
+        .edit-buttons {
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .edit-buttons button {
             font-size: 1rem;
             padding: 10px;
             background-color: transparent;
@@ -104,31 +103,26 @@ button#clickButton {
             border: none;
             opacity: 0.5;
             font-family: 'Junegull', sans-serif;
+            cursor: pointer;
         }
-        #editButton:hover { opacity: 1; }
+        .edit-buttons button:hover { opacity: 1; }
         .hidden { opacity: 0; height: 0; margin: 0; pointer-events: none; }
         .expanded { font-size: 40vw; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .full-button { 
-            font-size: 2rem; /* Уменьшен размер кнопки в режиме кнопки */
-            padding: 15px 30px; 
-            width: auto; /* Убрана фиксированная ширина */
-            height: auto; /* Убрана фиксированная высота */
-            margin-top: 20px; 
-        }
     </style>
 </head>
 <body>
     <h1 id="counter">500</h1>
     <button id="clickButton">Забрать напиток</button>
     <p id="message"></p>
-    <button id="editButton">ED</button>
+    <div class="edit-buttons">
+        <button id="counterModeButton">Counter</button>
+        <button id="buttonModeButton">Button</button>
+    </div>
 
-    <!-- Подключаем Firebase через CDN -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
         import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
-        // Конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyABGFrmc4SRwuuQIkdEWhydg-ru19O0ROk",
             authDomain: "tomi-348c8.firebaseapp.com",
@@ -140,7 +134,6 @@ button#clickButton {
             measurementId: "G-6F31PYWZ4H"
         };
 
-        // Инициализация Firebase
         let app, db, counterRef;
         let firebaseInitialized = false;
         try {
@@ -159,9 +152,9 @@ button#clickButton {
         const counterEl = document.getElementById('counter');
         const buttonEl = document.getElementById('clickButton');
         const messageEl = document.getElementById('message');
-        const editButtonEl = document.getElementById('editButton');
+        const counterModeButton = document.getElementById('counterModeButton');
+        const buttonModeButton = document.getElementById('buttonModeButton');
 
-        // Инициализация Firebase и синхронизация
         if (firebaseInitialized) {
             onValue(counterRef, (snapshot) => {
                 if (!snapshot.exists()) {
@@ -190,7 +183,6 @@ button#clickButton {
             console.warn("Firebase не работает, используем локальный режим");
         }
 
-        // Уменьшение счётчика
         function decreaseCounter() {
             console.log("Кнопка 'Забрать напиток' нажата, текущий count:", count);
             if (count > 0) {
@@ -207,7 +199,6 @@ button#clickButton {
             }
         }
 
-        // Обновление интерфейса
         function updateUI() {
             console.log("Обновление UI, count:", count);
             if (count === 0) {
@@ -219,28 +210,29 @@ button#clickButton {
             }
         }
 
-        // Переключение режима и редактирование
-        function editAndToggleMode() {
-            console.log("Кнопка 'ED' нажата, текущий режим:", isEditMode);
-            const input = prompt("Введите:\n1 - режим счётчика\n2 - режим кнопки\nили число для редактирования счётчика:", "");
-            
-            if (input === null) return; // Ничего не делаем при "Отмена"
+        function setCounterMode() {
+            buttonEl.classList.add('hidden');
+            counterEl.classList.remove('hidden');
+            counterEl.classList.add('expanded');
+            messageEl.classList.add('hidden');
+            isEditMode = false;
+            console.log("Переключено в режим счётчика");
+        }
 
-            if (input === "1") {
-                buttonEl.classList.add('hidden');
-                counterEl.classList.remove('hidden');
-                counterEl.classList.add('expanded');
-                messageEl.classList.add('hidden');
-                isEditMode = false;
-                console.log("Переключено в режим счётчика");
-            } else if (input === "2") {
-                counterEl.classList.remove('expanded');
-                counterEl.classList.add('hidden');
-                buttonEl.classList.remove('hidden');
-                buttonEl.classList.add('full-button');
-                isEditMode = true;
-                console.log("Переключено в режим кнопки");
-            } else if (!isNaN(input) && input !== "" && parseInt(input) >= 0) {
+        function setButtonMode() {
+            counterEl.classList.remove('expanded');
+            counterEl.classList.add('hidden');
+            buttonEl.classList.remove('hidden');
+            buttonEl.classList.add('full-button');
+            messageEl.classList.remove('hidden');
+            isEditMode = true;
+            console.log("Переключено в режим кнопки");
+        }
+
+        function editCounter() {
+            const input = prompt("Введите новое значение счётчика:", count);
+            if (input === null) return;
+            if (!isNaN(input) && input !== "" && parseInt(input) >= 0) {
                 count = parseInt(input);
                 if (firebaseInitialized) {
                     set(counterRef, count)
@@ -256,11 +248,11 @@ button#clickButton {
             }
         }
 
-        // Привязка событий
         buttonEl.onclick = decreaseCounter;
-        editButtonEl.onclick = editAndToggleMode;
+        counterModeButton.onclick = setCounterMode;
+        buttonModeButton.onclick = setButtonMode;
+        counterEl.onclick = editCounter;
 
-        // Инициализация интерфейса
         updateUI();
     </script>
 </body>
