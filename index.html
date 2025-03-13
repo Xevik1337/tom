@@ -15,13 +15,21 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh; /* Убедимся, что минимальная высота всегда 100vh */
             width: 100vw;
             font-family: 'Junegull', sans-serif;
             background-color: #F4A6D7;
             overflow: hidden;
             transition: all 0.5s ease;
             position: relative;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-grow: 1; /* Занимает всё доступное пространство */
         }
         h1#mainCounter {
             font-size: 30vw;
@@ -100,6 +108,7 @@
             opacity: 0.5;
             font-family: 'Junegull', sans-serif;
             cursor: pointer;
+            z-index: 10; /* Выше других элементов */
         }
         #editButton:hover { opacity: 1; }
         details summary {
@@ -123,6 +132,7 @@
             padding: 5px;
             margin: 0;
             list-style: none;
+            z-index: 10;
         }
         details menu button {
             display: block;
@@ -148,7 +158,7 @@
         .expanded { 
             font-size: 40vw; 
             width: 100%; 
-            height: 100%; /* Уменьшаем влияние на flex */
+            height: 100%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -173,10 +183,12 @@
     </style>
 </head>
 <body>
-    <h1 id="mainCounter">500</h1>
-    <h1 id="buttonCounter" class="hidden">500</h1>
-    <button id="clickButton">Забрать напиток</button>
-    <p id="message"></p>
+    <div class="content-wrapper">
+        <h1 id="mainCounter">500</h1>
+        <h1 id="buttonCounter" class="hidden">500</h1>
+        <button id="clickButton">Забрать напиток</button>
+        <p id="message"></p>
+    </div>
     <details id="editButton">
         <summary>ED</summary>
         <menu>
@@ -330,15 +342,18 @@
             buttonEl.classList.remove('hidden');
             buttonEl.classList.add('full-button');
             buttonCounterEl.classList.remove('hidden');
-            buttonCounterEl.classList.remove('expanded'); // Убираем лишние классы
+            buttonCounterEl.classList.remove('expanded');
             messageEl.classList.remove('hidden');
             isEditMode = true;
             localStorage.setItem('mode', 'button');
-            // Сбрасываем любые абсолютные стили, чтобы flex управлял центрированием
-            buttonCounterEl.style.position = '';
-            buttonCounterEl.style.top = '';
-            buttonCounterEl.style.left = '';
-            buttonCounterEl.style.transform = '';
+            // Принудительно обновляем центрирование
+            buttonCounterEl.style.margin = '0 auto';
+            buttonEl.style.margin = '0 auto';
+            // Принудительно вызываем пересчёт макета
+            bodyEl.style.display = 'flex';
+            setTimeout(() => {
+                bodyEl.style.display = 'flex'; // Двойной вызов для принудительного пересчёта
+            }, 0);
             console.log("Переключено в режим кнопки");
             editButtonEl.removeAttribute('open');
         }
@@ -350,7 +365,7 @@
             buttonEl.classList.remove('hidden', 'full-button');
             messageEl.classList.remove('hidden');
             isEditMode = false;
-            localStorage.setItem('mode', 'combined'); // Исправлено setMode на setItem
+            localStorage.setItem('mode', 'combined');
             console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
