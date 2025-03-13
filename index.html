@@ -10,17 +10,20 @@
             src: url('Junegull.ttf') format('truetype');
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh; /* Убедимся, что минимальная высота всегда 100vh */
+            min-height: 100vh;
             width: 100vw;
             font-family: 'Junegull', sans-serif;
             background-color: #F4A6D7;
-            overflow: hidden;
-            transition: all 0.5s ease;
             position: relative;
         }
         .content-wrapper {
@@ -29,7 +32,9 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            flex-grow: 1; /* Занимает всё доступное пространство */
+            height: 100vh; /* Фиксируем высоту для стабильного центрирования */
+            flex-shrink: 0; /* Не сжимаем */
+            flex-grow: 0; /* Не растягиваем */
         }
         h1#mainCounter {
             font-size: 30vw;
@@ -108,7 +113,7 @@
             opacity: 0.5;
             font-family: 'Junegull', sans-serif;
             cursor: pointer;
-            z-index: 10; /* Выше других элементов */
+            z-index: 10;
         }
         #editButton:hover { opacity: 1; }
         details summary {
@@ -149,16 +154,12 @@
             background-color: rgba(0, 71, 187, 0.1);
         }
         .hidden { 
-            opacity: 0; 
-            height: 0; 
-            margin: 0; 
-            pointer-events: none; 
-            overflow: hidden; 
+            display: none; /* Полностью скрываем элемент */
         }
         .expanded { 
             font-size: 40vw; 
             width: 100%; 
-            height: 100%; 
+            height: auto; /* Убираем фиксированную высоту */
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -178,7 +179,7 @@
             text-stroke: 2px white;
             width: 70vw;
             text-align: center;
-            margin-bottom: 20px; /* Отступ для центрирования с кнопкой */
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -239,6 +240,7 @@
         const buttonModeButton = document.getElementById('buttonMode');
         const resetModeButton = document.getElementById('resetMode');
         const bodyEl = document.body;
+        const contentWrapper = document.querySelector('.content-wrapper');
 
         const correctPin = "8732";
 
@@ -332,6 +334,8 @@
             messageEl.classList.add('hidden');
             isEditMode = false;
             localStorage.setItem('mode', 'counter');
+            // Сбрасываем стили wrapper
+            contentWrapper.style.height = '100vh';
             console.log("Переключено в режим счётчика");
             editButtonEl.removeAttribute('open');
         }
@@ -339,6 +343,7 @@
         function setButtonMode() {
             bodyEl.classList.remove('combined-mode');
             mainCounterEl.classList.add('hidden');
+            mainCounterEl.classList.remove('expanded'); // Убираем expanded
             buttonEl.classList.remove('hidden');
             buttonEl.classList.add('full-button');
             buttonCounterEl.classList.remove('hidden');
@@ -346,13 +351,16 @@
             messageEl.classList.remove('hidden');
             isEditMode = true;
             localStorage.setItem('mode', 'button');
-            // Принудительно обновляем центрирование
-            buttonCounterEl.style.margin = '0 auto';
-            buttonEl.style.margin = '0 auto';
-            // Принудительно вызываем пересчёт макета
-            bodyEl.style.display = 'flex';
+            // Сбрасываем стили для корректного центрирования
+            contentWrapper.style.height = '100vh';
+            contentWrapper.style.display = 'flex';
+            contentWrapper.style.alignItems = 'center';
+            contentWrapper.style.justifyContent = 'center';
+            // Принудительный пересчёт макета
             setTimeout(() => {
-                bodyEl.style.display = 'flex'; // Двойной вызов для принудительного пересчёта
+                contentWrapper.style.display = 'none';
+                contentWrapper.offsetHeight; // Заставляем пересчитать
+                contentWrapper.style.display = 'flex';
             }, 0);
             console.log("Переключено в режим кнопки");
             editButtonEl.removeAttribute('open');
@@ -366,6 +374,7 @@
             messageEl.classList.remove('hidden');
             isEditMode = false;
             localStorage.setItem('mode', 'combined');
+            contentWrapper.style.height = '100vh';
             console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
