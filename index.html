@@ -21,7 +21,7 @@
             background-color: #F4A6D7;
             overflow: hidden;
             transition: all 0.5s ease;
-            position: relative; /* Для дочерних элементов с position: absolute */
+            position: relative;
         }
         h1#mainCounter {
             font-size: 30vw;
@@ -52,8 +52,6 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            position: relative; /* Для стабильности позиции */
-            z-index: 1; /* Убедимся, что кнопка выше других элементов */
         }
         .full-button {
             width: 70vw;
@@ -145,12 +143,12 @@
             height: 0; 
             margin: 0; 
             pointer-events: none; 
-            overflow: hidden; /* Убедимся, что скрытые элементы не влияют на макет */
+            overflow: hidden; 
         }
         .expanded { 
             font-size: 40vw; 
             width: 100%; 
-            height: 100vh; 
+            height: 100%; /* Уменьшаем влияние на flex */
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -170,11 +168,7 @@
             text-stroke: 2px white;
             width: 70vw;
             text-align: center;
-            position: absolute; /* Фиксируем позицию счётчика кнопки */
-            top: 10vh; /* Располагаем выше кнопки */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 0; /* Ниже кнопки */
+            margin-bottom: 20px; /* Отступ для центрирования с кнопкой */
         }
     </style>
 </head>
@@ -247,7 +241,7 @@
                     mainCounterEl.textContent = count;
                     buttonCounterEl.textContent = count;
                     updateUI();
-                    restoreState(); // Восстанавливаем режим после загрузки данных
+                    restoreState();
                     console.log("Счётчик загружен из Firebase:", count);
                 }
             }, { onlyOnce: true });
@@ -336,14 +330,15 @@
             buttonEl.classList.remove('hidden');
             buttonEl.classList.add('full-button');
             buttonCounterEl.classList.remove('hidden');
+            buttonCounterEl.classList.remove('expanded'); // Убираем лишние классы
             messageEl.classList.remove('hidden');
             isEditMode = true;
             localStorage.setItem('mode', 'button');
-            // Устанавливаем явную позицию для buttonCounterEl
-            buttonCounterEl.style.position = 'absolute';
-            buttonCounterEl.style.top = '10vh';
-            buttonCounterEl.style.left = '50%';
-            buttonCounterEl.style.transform = 'translateX(-50%)';
+            // Сбрасываем любые абсолютные стили, чтобы flex управлял центрированием
+            buttonCounterEl.style.position = '';
+            buttonCounterEl.style.top = '';
+            buttonCounterEl.style.left = '';
+            buttonCounterEl.style.transform = '';
             console.log("Переключено в режим кнопки");
             editButtonEl.removeAttribute('open');
         }
@@ -355,7 +350,7 @@
             buttonEl.classList.remove('hidden', 'full-button');
             messageEl.classList.remove('hidden');
             isEditMode = false;
-            localStorage.setMode('mode', 'combined');
+            localStorage.setItem('mode', 'combined'); // Исправлено setMode на setItem
             console.log("Сброс в исходное состояние: счётчик + кнопка");
             editButtonEl.removeAttribute('open');
         }
